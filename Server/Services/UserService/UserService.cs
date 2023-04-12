@@ -17,7 +17,7 @@ namespace Email_Planner.Server.Services.UserService
         {
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
-            return new ServiceResponse<List<User>> { Success = true };
+            return await GetUsers();
         }
 
         public async Task<ServiceResponse<List<User>>> DeleteUser(int id)
@@ -36,7 +36,7 @@ namespace Email_Planner.Server.Services.UserService
 
                 dbUser.Deleted = true;
                 await _context.SaveChangesAsync();
-                return new ServiceResponse<List<User>> { Success = true };
+                return await GetUsers();
             }
         }
 
@@ -65,7 +65,6 @@ namespace Email_Planner.Server.Services.UserService
         public async Task<ServiceResponse<List<User>>> GetUsers()
         {
             var result = await _context.Users
-                .Where(u => u.Deleted == false)
                 .ToListAsync();
             return new ServiceResponse<List<User>>
             {
@@ -96,7 +95,7 @@ namespace Email_Planner.Server.Services.UserService
                 dbUser.Deleted = user.Deleted;
                 dbUser.Visible = user.Visible;
                 await _context.SaveChangesAsync();
-                return new ServiceResponse<List<User>> { Success = true };
+                return await GetUsers();
             }
         }
 

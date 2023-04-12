@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -18,5 +19,10 @@ namespace Email_Planner.Shared
         public DateTime DateUpdated { get; set; } = DateTime.Now;
         public bool Visible { get; set; } = true;
         public bool Deleted { get; set; } = false;
+        public string Role { get; set; } = "User";
+        [NotMapped]
+        public bool Editing { get; set; } = false;
+        [NotMapped]
+        public bool IsNew { get; set; } = false;
     }
 }

@@ -1,0 +1,120 @@
+﻿@page "/admin/users"
+@inject IUserService UserService
+@attribute [Authorize(Roles = "Admin")]
+@implements IDisposable
+
+<h3>Users</h3>
+
+@*<SfGrid DataSource="UserService.Users">
+
+</SfGrid>*@
+
+<div class="header">
+    <div class="col">Email</div>
+    <div class="col">Name</div>
+    <div class="col">Visible</div>
+</div>
+
+@foreach(var user in UserService.Users)
+{
+    @if (user.Editing)
+    {
+        <EditForm Model="editingUser" OnSubmit="UpdateUser">
+            <div class="row">
+                <div class="col">
+                    <InputText @bind-Value="editingUser.Email" class="form-control"></InputText>
+                </div>
+                <div class="col">
+                    <InputText @bind-Value="editingUser.Name" class="form-control"></InputText>
+                </div>
+                <div class="col">
+                    <InputCheckbox @bind-Value="editingUser.Visible" style="transform:scale(1.5,2);"></InputCheckbox>
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="oi oi-cloud-upload"></i>
+                    </button>
+                    <button class="btn btn-primary" @onclick="CancelEditing">
+                        <i class="oi oi-circle-x"></i>
+                    </button>
+                </div>
+            </div>
+        </EditForm>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col">
+                @user.Email
+            </div>
+            <div class="col">
+                @user.Name
+            </div>
+            <div class="col col-visible">
+                <span>@(user.Visible ? "✔" : "")</span>
+            </div>
+            <div class="col">
+                <button class="btn btn-primary" @onclick="(() => EditUser(user))">
+                    <i class="oi oi-pencil"></i>
+                </button>
+                <button class="btn btn-primary" @onclick="(() => DeleteUser(user.Id))">
+                    <i class="oi oi-trash"></i>
+                </button>
+            </div>
+        </div>
+    }
+}
+<button class="btn btn-primary" @onclick="CreateNewUser">
+    <i class="oi oi-plus">Add new user</i>
+</button>
+
+@code {
+    User editingUser = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UserService.GetUsers();
+        UserService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        UserService.OnChange -= StateHasChanged;
+    }
+
+    private void CreateNewUser()
+    {
+        editingUser = UserService.CreateNewUser();
+    }
+
+    private void EditUser(User user)
+    {
+        user.Editing = true;
+        editingUser = user;
+    }
+
+    private async Task UpdateUser()
+    {
+        if (editingUser.IsNew)
+        {
+            await UserService.AddUser(editingUser);
+        }
+        else
+        {
+            await UserService.UpdateUser(editingUser);
+        }
+
+        editingUser = new User();
+    }
+
+    private async Task CancelEditing()
+    {
+        editingUser = new User();
+        await UserService.GetUsers();
+    }
+
+    private async Task DeleteUser(int id)
+    {
+        await UserService.DeleteUser(id);
+    }
+}

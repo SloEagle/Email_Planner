@@ -2,6 +2,7 @@
 global using Email_Planner.Shared.DTOs;
 global using Email_Planner.Client.Services.AuthService;
 global using Microsoft.AspNetCore.Components.Authorization;
+global using Email_Planner.Client.Services.UserService;
 
 using Email_Planner.Client;
 using Microsoft.AspNetCore.Components.Web;
@@ -40,6 +41,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 //Authentication/Authorization
 builder.Services.AddOptions();
